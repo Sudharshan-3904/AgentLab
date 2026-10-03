@@ -41,6 +41,7 @@ class ExecutionManager:
         ledger: SQLiteEventLedger,
         policy_engine: IPolicyEngine,
         model_provider: Optional[IModelProvider] = None,
+        workspace_manager: Optional[Any] = None,
         execution_id: Optional[str] = None,
     ):
         self.execution_id = execution_id or f"exec-{uuid.uuid4().hex[:8]}"
@@ -49,6 +50,7 @@ class ExecutionManager:
         self.ledger = ledger
         self.policy_engine = policy_engine
         self.model_provider = model_provider
+        self.workspace_manager = workspace_manager
 
         self.scratchpad = Scratchpad(
             objective=task.objective,
@@ -303,3 +305,46 @@ class ExecutionManager:
             source="execution_manager",
             payload={"status": "CANCELLED", "reason": reason},
         )
+
+    def create_checkpoint(self, message: str) -> Optional[Any]:
+        """Create a workspace git checkpoint and record CHECKPOINT event."""
+        if not self.workspace_manager:
+            return None
+        record = self.workspace_manager.create_checkpoint(self.execution_id, message)
+        self.emit_event(
+            EventType.CHECKPOINT,
+            source="workspace_manager",
+            payload={
+                "checkpoint_id": record.checkpoint_id,
+                "commit_hash": record.commit_hash,
+                "message": record.message,
+            },
+        )
+        return record
+
+    def rollback(self, checkpoint_id: str) -> bool:
+        """Rollback workspace to a known checkpoint and record ROLLBACK event."""
+        if not self.workspace_manager:
+            return False
+        success = self.workspace_manager.rollback(checkpoint_id)
+        self.emit_event(
+            EventType.ROLLBACK,
+            source="workspace_manager",
+            payload={
+                "checkpoint_id": checkpoint_id,
+                "success": success,
+            },
+        )
+        return success
+
+    def get_workspace_diff(self, base_ref: Optional[str] = None) -> str:
+        """Retrieve git diff from workspace manager."""
+        if not self.workspace_manager:
+            return ""
+        return self.workspace_manager.get_diff(base_ref)
+
+    def get_workspace_status(self) -> Optional[Any]:
+        """Retrieve git status from workspace manager."""
+        if not self.workspace_manager:
+            return None
+        return self.workspace_manager.get_status()

@@ -45,12 +45,21 @@ class Harness:
         policy_engine: Optional[IPolicyEngine] = None,
         monitoring_manager: Optional[IMonitoringManager] = None,
         evaluation_engine: Optional[IEvaluationEngine] = None,
+        workspace_manager: Optional[Any] = None,
     ):
         self.config = config or HarnessConfig()
         self.ledger = SQLiteEventLedger(db_path)
         self.policy_engine = policy_engine or DefaultPolicyEngine()
         self.monitoring_manager = monitoring_manager
         self.evaluation_engine = evaluation_engine
+
+        if workspace_manager is not None:
+            self.workspace_manager = workspace_manager
+        elif self.config.workspace.git_enabled:
+            from harness.workspace.manager import WorkspaceManager
+            self.workspace_manager = WorkspaceManager(self.config.workspace.root)
+        else:
+            self.workspace_manager = None
 
         self.model_providers: Dict[str, IModelProvider] = model_providers or {}
         self.skills: Dict[str, ISkillSuite] = skills or {}
@@ -113,6 +122,7 @@ class Harness:
             ledger=self.ledger,
             policy_engine=self.policy_engine,
             model_provider=provider,
+            workspace_manager=self.workspace_manager,
             execution_id=execution_id,
         )
         for skill in self.skills.values():
