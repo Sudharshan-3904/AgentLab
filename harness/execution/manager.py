@@ -43,6 +43,7 @@ class ExecutionManager:
         model_provider: Optional[IModelProvider] = None,
         workspace_manager: Optional[Any] = None,
         model_router: Optional[Any] = None,
+        app_tester: Optional[Any] = None,
         execution_id: Optional[str] = None,
     ):
         self.execution_id = execution_id or f"exec-{uuid.uuid4().hex[:8]}"
@@ -53,6 +54,11 @@ class ExecutionManager:
         self.model_provider = model_provider
         self.workspace_manager = workspace_manager
         self.model_router = model_router
+
+        from harness.execution.app_tester import AppTestingManager
+        self.app_tester = app_tester or AppTestingManager(
+            on_event=lambda ev_type, src, payload: self.emit_event(ev_type, src, payload)
+        )
 
         self.scratchpad = Scratchpad(
             objective=task.objective,
@@ -360,3 +366,54 @@ class ExecutionManager:
         if not self.workspace_manager:
             return None
         return self.workspace_manager.get_status()
+
+    def launch_application(
+        self,
+        workspace_path: Optional[str] = None,
+        command: Optional[str | List[str]] = None,
+        port: Optional[int] = None,
+    ) -> Any:
+        """Launch the application for preview or testing."""
+        if self.current_state in (ExecutionState.EXECUTING, ExecutionState.VERIFYING):
+            self.transition_to(ExecutionState.TESTING, reason="Launching application for testing/preview")
+
+        ws = workspace_path or self.config.workspace.root
+        return self.app_tester.launch(ws, command=command, port=port)
+
+    def check_application_health(
+        self,
+        app_or_url: Optional[Any] = None,
+        path: Optional[str] = None,
+        timeout: float = 10.0,
+        retry_interval: float = 0.4,
+    ) -> bool:
+        """Probe application health."""
+        if app_or_url is None:
+            if not self.app_tester.active_apps:
+                return False
+            app_or_url = list(self.app_tester.active_apps.values())[-1]
+        return self.app_tester.health_check(app_or_url, path=path, timeout=timeout, retry_interval=retry_interval)
+
+    def submit_user_feedback(
+        self,
+        feedback_text: str,
+        passed: bool = True,
+        rating: Optional[int] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Submit feedback on application behavior."""
+        self.scratchpad.append_note(f"User Feedback: {feedback_text} (Passed: {passed}, Rating: {rating})")
+        return self.app_tester.collect_feedback(
+            execution_id=self.execution_id,
+            feedback_text=feedback_text,
+            passed=passed,
+            rating=rating,
+            metadata=metadata,
+        )
+
+    def stop_application(self, app_id: Optional[str] = None) -> None:
+        """Stop running application(s)."""
+        if app_id:
+            self.app_tester.stop(app_id)
+        else:
+            self.app_tester.stop_all()

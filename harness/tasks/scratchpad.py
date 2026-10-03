@@ -26,6 +26,11 @@ class Scratchpad(BaseModel):
     failed: List[str] = Field(default_factory=list)
     pending: List[str] = Field(default_factory=list)
     recovery_history: List[RecoveryEntry] = Field(default_factory=list)
+    notes: List[str] = Field(default_factory=list)
+
+    def append_note(self, note: str) -> None:
+        """Record an informational note or user feedback."""
+        self.notes.append(note)
 
     def set_subtasks(self, subtasks: List[str]) -> None:
         """Set decomposed subtasks and populate pending queue."""

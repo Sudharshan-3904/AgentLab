@@ -48,6 +48,7 @@ class Harness:
         evaluation_engine: Optional[IEvaluationEngine] = None,
         workspace_manager: Optional[Any] = None,
         model_router: Optional[Any] = None,
+        app_tester: Optional[Any] = None,
     ):
         self.config = config or HarnessConfig()
         self.ledger = SQLiteEventLedger(db_path)
@@ -77,6 +78,7 @@ class Harness:
             from harness.models.router import ModelRouter
             self.model_router = ModelRouter.from_config(self.config.routing, self.config.model.default_model)
 
+        self.app_tester = app_tester
         self.model_providers: Dict[str, IModelProvider] = model_providers or {}
         self.skills: Dict[str, ISkillSuite] = skills or {}
         self.tools: Dict[str, ITool] = tools or {}
@@ -141,6 +143,7 @@ class Harness:
             model_provider=provider,
             workspace_manager=self.workspace_manager,
             model_router=self.model_router,
+            app_tester=self.app_tester,
             execution_id=execution_id,
         )
         for skill in self.skills.values():
