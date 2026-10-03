@@ -20,11 +20,12 @@ import time
 import webbrowser
 from typing import Dict, List, Optional
 
-# Ensure the backend directory is in sys.path
+# Ensure root and backend directories are in sys.path
 PROJECT_ROOT = Path(__file__).resolve().parent
 BACKEND_DIR = PROJECT_ROOT / "backend"
-if str(BACKEND_DIR) not in sys.path:
-    sys.path.insert(0, str(BACKEND_DIR))
+for path_entry in [str(PROJECT_ROOT), str(BACKEND_DIR)]:
+    if path_entry not in sys.path:
+        sys.path.insert(0, path_entry)
 
 from harness.core.config import (
     AutonomyLevel,
@@ -95,7 +96,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     model_group.add_argument(
         "--model",
-        default="llama3.2",
+        default="llama3.2:latest",
         help="Default model identifier to use for agent reasoning.",
     )
     model_group.add_argument(

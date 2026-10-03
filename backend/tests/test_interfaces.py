@@ -48,7 +48,7 @@ class MockModelProvider(IModelProvider):
             call_id="call-001",
             execution_id=request.execution_id,
             provider="mock-ollama",
-            model=request.model or "llama3.2",
+            model=request.model or "llama3.2:latest",
             temperature=request.temperature,
             top_p=request.top_p,
             started_at="2026-10-03T20:00:00Z",
@@ -198,8 +198,8 @@ def test_mock_model_provider_contract():
     health = provider.health()
     assert health.available is True
 
-    meta = provider.metadata("llama3.2")
-    assert meta.name == "llama3.2"
+    meta = provider.metadata("llama3.2:latest")
+    assert meta.name == "llama3.2:latest"
 
     req = ModelRequest(
         execution_id="exec-contract-1",

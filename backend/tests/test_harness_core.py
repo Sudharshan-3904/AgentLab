@@ -32,7 +32,7 @@ class StubModel(IModelProvider):
             call_id="call-stub-1",
             execution_id=request.execution_id,
             provider="ollama",
-            model=request.model or "llama3.2",
+            model=request.model or "llama3.2:latest",
             temperature=request.temperature,
             top_p=request.top_p,
             started_at="2026-10-03T20:00:00Z",
@@ -54,7 +54,7 @@ class StubModel(IModelProvider):
         return ModelHealth(available=True)
 
     def metadata(self, model_name=None) -> ModelMetadata:
-        return ModelMetadata(name="llama3.2", provider="ollama")
+        return ModelMetadata(name="llama3.2:latest", provider="ollama")
 
 
 class StubTool(ITool):

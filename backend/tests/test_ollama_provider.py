@@ -49,9 +49,9 @@ def test_ollama_metadata():
     session.post.return_value = mock_resp
 
     provider = OllamaProvider(session=session)
-    meta = provider.metadata("llama3.2")
+    meta = provider.metadata("llama3.2:latest")
 
-    assert meta.name == "llama3.2"
+    assert meta.name == "llama3.2:latest"
     assert meta.provider == "ollama"
     assert meta.quantization == "Q4_K_M"
     assert meta.version == "gguf"
@@ -73,7 +73,7 @@ def test_ollama_generate_success():
     req = ModelRequest(
         execution_id="exec-ollama-1",
         messages=[ChatMessage(role="user", content="Write an add function")],
-        model="llama3.2",
+        model="llama3.2:latest",
         temperature=0.3,
         top_p=0.85,
         seed=123,

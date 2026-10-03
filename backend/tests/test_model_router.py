@@ -56,7 +56,7 @@ class DynamicModelProvider(IModelProvider):
 
 def test_model_router_rules():
     router = ModelRouter(
-        default_model="llama3.2",
+        default_model="llama3.2:latest",
         rules={
             "planning": "deepseek-r1",
             "coding": "qwen2.5-coder",
@@ -67,16 +67,16 @@ def test_model_router_rules():
     assert router.resolve_model("planning") == "deepseek-r1"
     assert router.resolve_model("coding") == "qwen2.5-coder"
     assert router.resolve_model("testing") == "llama3.2-fast"
-    assert router.resolve_model("unknown_skill") == "llama3.2"
+    assert router.resolve_model("unknown_skill") == "llama3.2:latest"
 
 
 def test_model_router_disabled():
     router = ModelRouter(
-        default_model="llama3.2",
+        default_model="llama3.2:latest",
         rules={"coding": "qwen2.5-coder"},
         enabled=False,
     )
-    assert router.resolve_model("coding") == "llama3.2"
+    assert router.resolve_model("coding") == "llama3.2:latest"
 
 
 def test_execution_manager_automatic_model_routing():

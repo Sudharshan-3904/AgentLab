@@ -41,7 +41,7 @@ class PipelineMockModel(IModelProvider):
             call_id="call-plan-1",
             execution_id=request.execution_id,
             provider="mock-ollama",
-            model=request.model or "llama3.2",
+            model=request.model or "llama3.2:latest",
             temperature=request.temperature,
             top_p=request.top_p,
             started_at="2026-10-03T20:00:00Z",
@@ -64,7 +64,7 @@ class PipelineMockModel(IModelProvider):
         return ModelHealth(available=True)
 
     def metadata(self, model_name=None) -> ModelMetadata:
-        return ModelMetadata(name=model_name or "llama3.2", provider="mock")
+        return ModelMetadata(name=model_name or "llama3.2:latest", provider="mock")
 
 
 class PipelineMockTool(ITool):

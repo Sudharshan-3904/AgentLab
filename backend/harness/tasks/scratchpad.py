@@ -44,6 +44,8 @@ class Scratchpad(BaseModel):
         if subtask not in self.completed:
             self.completed.append(subtask)
 
+    mark_completed = complete_subtask
+
     def fail_subtask(self, subtask: str, reason: str = "") -> None:
         """Mark a subtask as failed."""
         if subtask in self.pending:

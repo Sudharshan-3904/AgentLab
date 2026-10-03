@@ -29,7 +29,7 @@ class ExecutionConfig(BaseModel):
 
 class ModelConfig(BaseModel):
     default_provider: str = Field(default="ollama", description="Default model provider (ollama, lmstudio)")
-    default_model: str = Field(default="llama3.2", description="Default model name")
+    default_model: str = Field(default="llama3.2:latest", description="Default model name")
 
 
 class RoutingConfig(BaseModel):
@@ -106,7 +106,7 @@ class ReproducibilityProfile(BaseModel):
     seed: Optional[int] = 42
     model: Dict[str, Any] = Field(default_factory=lambda: {
         "provider": "ollama",
-        "name": "llama3.2",
+        "name": "llama3.2:latest",
         "version": "unknown",
         "quantization": "unknown",
     })

@@ -71,7 +71,7 @@ def test_phase2_exit_criteria_model_runtime_workflow():
 
     provider = OllamaProvider(
         base_url="http://localhost:11434",
-        default_model="llama3.2",
+        default_model="llama3.2:latest",
         session=session,
     )
 
@@ -80,14 +80,14 @@ def test_phase2_exit_criteria_model_runtime_workflow():
     assert health.available is True
     assert "0.5.8" in health.message
 
-    meta = provider.metadata("llama3.2")
-    assert meta.name == "llama3.2"
+    meta = provider.metadata("llama3.2:latest")
+    assert meta.name == "llama3.2:latest"
     assert meta.quantization == "Q4_K_M"
 
     # 2. Setup Harness with the model provider
     config = HarnessConfig()
     config.model.default_provider = "ollama"
-    config.model.default_model = "llama3.2"
+    config.model.default_model = "llama3.2:latest"
 
     harness = Harness(config=config)
     harness.register_model_provider("ollama", provider)
@@ -101,7 +101,7 @@ def test_phase2_exit_criteria_model_runtime_workflow():
     assert response.record.prompt_tokens == 80
     assert response.record.output_tokens == 35
     assert response.record.provider == "ollama"
-    assert response.record.model == "llama3.2"
+    assert response.record.model == "llama3.2:latest"
     assert response.record.duration_ms >= 0
 
     # 4. Verify telemetry events persisted in SQLite ledger

@@ -17,7 +17,7 @@ def test_default_config():
     assert config.execution.max_duration_seconds == 3600
     assert config.execution.max_recovery_attempts == 1
     assert config.model.default_provider == "ollama"
-    assert config.model.default_model == "llama3.2"
+    assert config.model.default_model == "llama3.2:latest"
     assert config.routing.enabled is True
     assert config.sampling.temperature == 0.2
     assert config.sampling.top_p == 0.9

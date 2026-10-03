@@ -48,7 +48,7 @@ class IntegrationMockModel(IModelProvider):
             call_id="call-int-001",
             execution_id=request.execution_id,
             provider="ollama",
-            model="llama3.2",
+            model="llama3.2:latest",
             temperature=request.temperature,
             top_p=request.top_p,
             started_at="2026-10-03T20:00:00Z",
@@ -71,7 +71,7 @@ class IntegrationMockModel(IModelProvider):
         return ModelHealth(available=True)
 
     def metadata(self, model_name=None) -> ModelMetadata:
-        return ModelMetadata(name="llama3.2", provider="ollama")
+        return ModelMetadata(name="llama3.2:latest", provider="ollama")
 
 
 class IntegrationMockTool(ITool):

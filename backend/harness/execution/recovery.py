@@ -144,9 +144,11 @@ class RecoveryStrategyEngine:
         # 2. Capture conversation
         conv_messages = list(messages or [])
         if not conv_messages and manager.model_call_records:
-            # Reconstruct from last model call
+            # Reconstruct from last model call if available
             last_record = manager.model_call_records[-1]
-            conv_messages = list(last_record.request.messages)
+            req = getattr(last_record, "request", None)
+            if req and hasattr(req, "messages"):
+                conv_messages = list(req.messages)
 
         # 3. Append failure to scratchpad
         action_desc = f"Analyzing {failure_type.value} and retrying implementation"

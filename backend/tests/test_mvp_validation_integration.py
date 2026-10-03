@@ -123,7 +123,7 @@ def test_complete_mvp_validation_criteria(tmp_path: Path):
     config.routing.rules = {
         "planning": "deepseek-r1",
         "coding": "qwen2.5-coder",
-        "testing": "llama3.2",
+        "testing": "llama3.2:latest",
     }
 
     model = ComprehensiveMVPModelProvider()

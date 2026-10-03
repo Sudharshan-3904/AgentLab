@@ -27,7 +27,7 @@ class OllamaProvider(IModelProvider):
     def __init__(
         self,
         base_url: str = "http://localhost:11434",
-        default_model: str = "llama3.2",
+        default_model: str = "llama3.2:latest",
         timeout: float = 60.0,
         session: Optional[requests.Session] = None,
     ):

@@ -115,21 +115,28 @@ class HarnessRequestHandler(http.server.BaseHTTPRequestHandler):
             self._handle_create_execution()
             return
 
-        # 2. API: POST /executions/{id}/feedback
+        # 2. API: POST /executions/{id}/start
+        m = re.match(r"^/(?:api/)?executions/([^/]+)/start$", path)
+        if m:
+            exec_id = m.group(1)
+            self._handle_start_execution(exec_id)
+            return
+
+        # 3. API: POST /executions/{id}/feedback
         m = re.match(r"^/(?:api/)?executions/([^/]+)/feedback$", path)
         if m:
             exec_id = m.group(1)
             self._handle_submit_feedback(exec_id)
             return
 
-        # 3. API: POST /executions/{id}/cancel
+        # 4. API: POST /executions/{id}/cancel
         m = re.match(r"^/(?:api/)?executions/([^/]+)/cancel$", path)
         if m:
             exec_id = m.group(1)
             self._handle_cancel_execution(exec_id)
             return
 
-        # 4. API: POST /benchmarks
+        # 5. API: POST /benchmarks
         if path == "/benchmarks" or path == "/api/benchmarks":
             self._handle_create_benchmark()
             return
@@ -185,13 +192,34 @@ class HarnessRequestHandler(http.server.BaseHTTPRequestHandler):
         payload = self._read_json()
         objective = payload.get("objective", "Autonomous coding task")
         constraints = payload.get("constraints", [])
+        auto_run = payload.get("auto_run", False)
         task = Task(objective=objective, constraints=constraints)
         manager = self.server.harness.create_execution(task)
+        if auto_run:
+            thread = threading.Thread(target=manager.run_autonomous, daemon=True)
+            thread.start()
         self._send_json(201, {
             "execution_id": manager.execution_id,
             "objective": manager.task.objective,
             "state": manager.current_state.value,
             "created": True,
+        })
+
+    def _handle_start_execution(self, exec_id: str) -> None:
+        mgr = self.server.harness.get_execution(exec_id)
+        if not mgr:
+            self._send_json(404, {"error": f"Execution '{exec_id}' not found"})
+            return
+        if mgr.is_finished:
+            self._send_json(400, {"error": f"Execution '{exec_id}' is already in a terminal state ({mgr.current_state.value})"})
+            return
+        thread = threading.Thread(target=mgr.run_autonomous, daemon=True)
+        thread.start()
+        self._send_json(200, {
+            "success": True,
+            "execution_id": exec_id,
+            "state": mgr.current_state.value,
+            "message": "Autonomous execution started",
         })
 
     def _handle_submit_feedback(self, exec_id: str) -> None:

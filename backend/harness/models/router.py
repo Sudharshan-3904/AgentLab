@@ -11,7 +11,7 @@ class ModelRouter:
 
     def __init__(
         self,
-        default_model: str = "llama3.2",
+        default_model: str = "llama3.2:latest",
         rules: Optional[Dict[str, str]] = None,
         enabled: bool = True,
     ):

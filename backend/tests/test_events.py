@@ -36,12 +36,12 @@ def test_event_json_serialization():
         execution_id="exec-003",
         type=EventType.MODEL_SELECTED,
         source="model_router",
-        payload={"provider": "ollama", "model": "llama3.2"},
+        payload={"provider": "ollama", "model": "llama3.2:latest"},
     )
     json_str = event.model_dump_json()
     assert "MODEL_SELECTED" in json_str
     assert "exec-003" in json_str
-    assert "llama3.2" in json_str
+    assert "llama3.2:latest" in json_str
 
 
 def test_event_categories():

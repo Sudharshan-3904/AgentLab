@@ -6,44 +6,44 @@ Initial harness configuration is YAML.
 
 ```yaml
 harness:
-  name: local-coding-harness
-  version: 0.1
+    name: local-coding-harness
+    version: 0.1
 
 execution:
-  autonomy: balanced
-  max_duration_seconds: 3600
-  max_recovery_attempts: 1
+    autonomy: balanced
+    max_duration_seconds: 3600
+    max_recovery_attempts: 1
 
 model:
-  default_provider: ollama
-  default_model: llama3.2
+    default_provider: ollama
+    default_model: llama3.2
 
 routing:
-  enabled: true
+    enabled: true
 
 sampling:
-  temperature: 0.2
-  top_p: 0.9
-  seed: 42
+    temperature: 0.2
+    top_p: 0.9
+    seed: 42
 
 workspace:
-  root: ./workspace
-  git_enabled: true
+    root: ./workspace
+    git_enabled: true
 
 sandbox:
-  runtime: docker
-  network: false
+    runtime: docker
+    network: false
 
 monitoring:
-  cpu: true
-  ram: true
-  gpu: true
-  vram: true
-  power: true
-  temperature: true
+    cpu: true
+    ram: true
+    gpu: true
+    vram: true
+    power: true
+    temperature: true
 
 reporting:
-  advanced_mode: false
+    advanced_mode: false
 ```
 
 ## 2. Reproducibility Profile
@@ -52,32 +52,32 @@ A reproducibility profile should be generated for every benchmark execution.
 
 ```yaml
 reproducibility:
-  seed: 42
+    seed: 42
 
 model:
-  provider: ollama
-  name: llama3.2
-  version: unknown
-  quantization: unknown
+    provider: ollama
+    name: llama3.2
+    version: unknown
+    quantization: unknown
 
 sampling:
-  temperature: 0.2
-  top_p: 0.9
+    temperature: 0.2
+    top_p: 0.9
 
 runtime:
-  harness_version: 0.1
-  python_version: ...
-  os: ...
-  backend_version: ...
+    harness_version: 0.1
+    python_version: ...
+    os: ...
+    backend_version: ...
 
 hardware:
-  cpu: ...
-  ram_gb: ...
-  gpu: ...
-  vram_gb: ...
+    cpu: ...
+    ram_gb: ...
+    gpu: ...
+    vram_gb: ...
 
 execution:
-  concurrency: 1
+    concurrency: 1
 ```
 
 ## 3. Event Schema
@@ -86,12 +86,12 @@ All execution events should have:
 
 ```json
 {
-  "event_id": "...",
-  "execution_id": "...",
-  "timestamp": "...",
-  "type": "...",
-  "source": "...",
-  "payload": {}
+    "event_id": "...",
+    "execution_id": "...",
+    "timestamp": "...",
+    "type": "...",
+    "source": "...",
+    "payload": {}
 }
 ```
 
@@ -143,18 +143,18 @@ This allows latency and failure analysis.
 
 ```json
 {
-  "call_id": "...",
-  "execution_id": "...",
-  "provider": "ollama",
-  "model": "llama3.2",
-  "temperature": 0.2,
-  "top_p": 0.9,
-  "seed": 42,
-  "started_at": "...",
-  "completed_at": "...",
-  "prompt_tokens": 1234,
-  "output_tokens": 567,
-  "duration_ms": 12000
+    "call_id": "...",
+    "execution_id": "...",
+    "provider": "ollama",
+    "model": "llama3.2:latest",
+    "temperature": 0.2,
+    "top_p": 0.9,
+    "seed": 42,
+    "started_at": "...",
+    "completed_at": "...",
+    "prompt_tokens": 1234,
+    "output_tokens": 567,
+    "duration_ms": 12000
 }
 ```
 
@@ -211,7 +211,7 @@ Sampling should occur at a configurable interval.
 
 ```yaml
 monitoring:
-  interval_ms: 500
+    interval_ms: 500
 ```
 
 Metrics:
@@ -264,15 +264,15 @@ rather than inventing values.
 
 ```json
 {
-  "objective": "...",
-  "constraints": [],
-  "assumptions": [],
-  "subtasks": [],
-  "verification": [],
-  "clarifications": [],
-  "completed": [],
-  "failed": [],
-  "pending": []
+    "objective": "...",
+    "constraints": [],
+    "assumptions": [],
+    "subtasks": [],
+    "verification": [],
+    "clarifications": [],
+    "completed": [],
+    "failed": [],
+    "pending": []
 }
 ```
 
@@ -368,25 +368,25 @@ The harness should separate raw metrics from derived metrics.
 
 ```yaml
 benchmark:
-  name: coding-basic-v1
-  version: 1
+    name: coding-basic-v1
+    version: 1
 
 tasks:
-  - id: task-001
-    prompt: ...
-  - id: task-002
-    prompt: ...
+    - id: task-001
+      prompt: ...
+    - id: task-002
+      prompt: ...
 
 execution:
-  repetitions: 10
-  seed: 42
+    repetitions: 10
+    seed: 42
 
 models:
-  - llama3.2
-  - qwen-coder
+    - llama3.2
+    - qwen-coder
 
 evaluation:
-  success: test_pass
+    success: test_pass
 ```
 
 ## 16. Report Generation
