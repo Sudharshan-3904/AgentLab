@@ -10,6 +10,7 @@ from harness.models.interface import (
     ModelRequest,
     ModelResponse,
 )
+from harness.models.ollama import OllamaProvider
 
 __all__ = [
     "ChatMessage",
@@ -20,4 +21,5 @@ __all__ = [
     "ModelMetadata",
     "ModelRequest",
     "ModelResponse",
+    "OllamaProvider",
 ]
