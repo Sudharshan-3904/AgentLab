@@ -10,6 +10,7 @@ from harness.models.interface import (
     ModelRequest,
     ModelResponse,
 )
+from harness.models.factory import ModelProviderRegistry
 from harness.models.lmstudio import LMStudioProvider
 from harness.models.ollama import OllamaProvider
 
@@ -21,6 +22,7 @@ __all__ = [
     "ModelChunk",
     "ModelHealth",
     "ModelMetadata",
+    "ModelProviderRegistry",
     "ModelRequest",
     "ModelResponse",
     "OllamaProvider",

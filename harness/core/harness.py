@@ -74,6 +74,22 @@ class Harness:
         """Register a model inference provider backend."""
         self.model_providers[name] = provider
 
+    def get_model_provider(self, name: Optional[str] = None) -> Optional[IModelProvider]:
+        """Get or lazily instantiate configured model provider."""
+        provider_name = name or self.config.model.default_provider
+        if provider_name in self.model_providers:
+            return self.model_providers[provider_name]
+        try:
+            from harness.models.factory import ModelProviderRegistry
+            provider = ModelProviderRegistry.create(
+                provider_name,
+                default_model=self.config.model.default_model,
+            )
+            self.model_providers[provider_name] = provider
+            return provider
+        except Exception:
+            return None
+
     def register_skill(self, skill: ISkillSuite) -> None:
         """Register a behavioral skill suite."""
         self.skills[skill.name] = skill
@@ -90,7 +106,7 @@ class Harness:
         """Create and track a new logical agent execution."""
         task_obj = Task.from_prompt(task) if isinstance(task, str) else task
 
-        provider = self.model_providers.get(self.config.model.default_provider)
+        provider = self.get_model_provider(self.config.model.default_provider)
         manager = ExecutionManager(
             task=task_obj,
             config=self.config,
