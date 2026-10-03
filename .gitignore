@@ -5,3 +5,7 @@ data
 
 *.env
 *.log
+*.db
+*.jsonl
+exec-*
+.pytest_cache/
