@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
 from harness.core.config import HarnessConfig
 from harness.core.events import Event
@@ -16,7 +16,8 @@ from harness.core.interfaces import (
     ISkillSuite,
     ITool,
 )
-from harness.execution.manager import ExecutionManager
+if TYPE_CHECKING:
+    from harness.execution.manager import ExecutionManager
 from harness.ledger.sqlite import SQLiteEventLedger
 from harness.tasks.task import Task
 
@@ -130,6 +131,7 @@ class Harness:
         """Create and track a new logical agent execution."""
         task_obj = Task.from_prompt(task) if isinstance(task, str) else task
 
+        from harness.execution.manager import ExecutionManager
         provider = self.get_model_provider(self.config.model.default_provider)
         manager = ExecutionManager(
             task=task_obj,
