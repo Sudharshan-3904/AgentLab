@@ -1,5 +1,6 @@
-"""Model providers and interfaces."""
+"""Model package and implementations."""
 
+from harness.models.factory import ModelProviderRegistry
 from harness.models.interface import (
     ChatMessage,
     IModelProvider,
@@ -10,9 +11,9 @@ from harness.models.interface import (
     ModelRequest,
     ModelResponse,
 )
-from harness.models.factory import ModelProviderRegistry
 from harness.models.lmstudio import LMStudioProvider
 from harness.models.ollama import OllamaProvider
+from harness.models.router import ModelRouter
 
 __all__ = [
     "ChatMessage",
@@ -25,5 +26,6 @@ __all__ = [
     "ModelProviderRegistry",
     "ModelRequest",
     "ModelResponse",
+    "ModelRouter",
     "OllamaProvider",
 ]

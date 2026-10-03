@@ -42,6 +42,7 @@ class ExecutionManager:
         policy_engine: IPolicyEngine,
         model_provider: Optional[IModelProvider] = None,
         workspace_manager: Optional[Any] = None,
+        model_router: Optional[Any] = None,
         execution_id: Optional[str] = None,
     ):
         self.execution_id = execution_id or f"exec-{uuid.uuid4().hex[:8]}"
@@ -51,6 +52,7 @@ class ExecutionManager:
         self.policy_engine = policy_engine
         self.model_provider = model_provider
         self.workspace_manager = workspace_manager
+        self.model_router = model_router
 
         self.scratchpad = Scratchpad(
             objective=task.objective,
@@ -134,6 +136,16 @@ class ExecutionManager:
         )
         self.continuity_summary = summary
         self.active_skill = self.skill_manager.active_skill
+
+        if self.model_router:
+            route_info = self.model_router.route_for_phase(
+                self.execution_id,
+                skill_name,
+                self.active_model_name,
+            )
+            if route_info.get("transitioned"):
+                self.route_model(route_info["selected_model"], reason=route_info["reason"])
+
         return summary
 
     def route_model(self, model_name: str, reason: str = "") -> None:
