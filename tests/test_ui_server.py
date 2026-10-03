@@ -114,6 +114,15 @@ def test_ui_api_server_endpoints():
             c_res = json.loads(resp.read().decode("utf-8"))
             assert c_res["state"] == "CANCELLED"
 
+        # 10. Test static UI dashboard GET /
+        with urllib.request.urlopen(f"{base_url}/") as resp:
+            assert resp.status == 200
+            assert "text/html" in resp.headers.get("Content-Type", "")
+            html = resp.read().decode("utf-8")
+            assert "AgentLab — Local AI Coding Harness" in html
+            assert "Task Entry" in html
+            assert "Execution" in html
+
     finally:
         server_mgr.stop()
         harness.close()
