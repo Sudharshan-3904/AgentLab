@@ -466,3 +466,57 @@ The project should remain:
 - experiment-friendly
 
 The harness should make AI execution observable without turning the system into a black box.
+
+## 23. Quickstart & Launching AgentLab
+
+To launch AgentLab with all default settings:
+
+```bash
+python main.py
+```
+
+### Common Launch Commands
+
+```bash
+# Launch with automated browser open
+python main.py --open-browser
+
+# Launch with custom host, port, and provider model
+python main.py --host 127.0.0.1 --port 8000 --provider ollama --model llama3.2
+
+# Launch with skill-based model routing
+python main.py --routing --planning-model llama3.2 --coding-model qwen2.5:1.5b --testing-model llama3.2
+
+# Launch with autonomous execution policy and custom workspace
+python main.py --autonomy autonomous --workspace ./workspace --db ./data/ledger.db
+```
+
+### Full Parameter Reference
+
+| Parameter | Type / Choices | Default | Description |
+|---|---|---|---|
+| `--host` | `str` | `127.0.0.1` | Host interface to bind API and Dashboard UI |
+| `--port` | `int` | `8000` | Port number to listen on |
+| `--open-browser` | flag | `False` | Automatically open default browser on launch |
+| `--provider` | `ollama`, `lmstudio` | `ollama` | Primary local LLM inference provider backend |
+| `--model` | `str` | `llama3.2` | Primary default model name |
+| `--provider-url` | `str` | `None` | Custom base endpoint URL for provider API |
+| `--routing` | flag | `True` | Enable dynamic model routing across skills |
+| `--no-routing` | flag | | Disable dynamic model routing |
+| `--planning-model` | `str` | `--model` | Model specialized for planning phase |
+| `--coding-model` | `str` | `--model` | Model specialized for coding phase |
+| `--testing-model` | `str` | `--model` | Model specialized for testing phase |
+| `--debugging-model` | `str` | `--model` | Model specialized for debugging phase |
+| `--autonomy` | `restricted`, `balanced`, `autonomous` | `balanced` | Execution autonomy and safety policy |
+| `--max-duration` | `int` | `3600` | Execution timeout limit in seconds |
+| `--max-recovery` | `int` | `2` | Max automated self-healing recovery attempts |
+| `--temperature` | `float` | `0.2` | LLM sampling temperature |
+| `--top-p` | `float` | `0.9` | LLM nucleus sampling probability |
+| `--seed` | `int` | `42` | Random seed for reproducibility |
+| `--workspace` | `str` | `./workspace` | Workspace directory for agent file operations |
+| `--db` | `str` | `./data/ledger.db` | SQLite database path for event ledger & metrics |
+| `--sandbox` | `local`, `docker` | `local` | Execution sandbox runtime |
+| `--no-git` | flag | `False` | Disable automatic Git tracking in workspace |
+| `--config` | `str` | `None` | Path to custom YAML configuration file |
+| `-v, --verbose` | flag | `False` | Enable debug-level logging |
+
