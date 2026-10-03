@@ -23,12 +23,15 @@ class RawMetrics(BaseModel):
     output_tokens: Optional[int] = None
     total_tokens: Optional[int] = None
     skill_transitions_count: int = 0
+    model_transitions_count: int = 0
     recovery_attempts_count: int = 0
     peak_cpu_percent: float = 0.0
     avg_cpu_percent: float = 0.0
     peak_ram_mb: float = 0.0
     avg_ram_mb: float = 0.0
     peak_vram_mb: Optional[float] = None
+    avg_gpu_percent: Optional[float] = None
+    avg_power_watts: Optional[float] = None
 
 
 class DerivedMetrics(BaseModel):

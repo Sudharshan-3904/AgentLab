@@ -1,5 +1,6 @@
-"""Evaluation package and interfaces."""
+"""Evaluation package for Local AI Harness."""
 
+from harness.evaluation.engine import EvaluationEngine
 from harness.evaluation.interface import (
     DerivedMetrics,
     EvaluationSummary,
@@ -8,6 +9,7 @@ from harness.evaluation.interface import (
 )
 
 __all__ = [
+    "EvaluationEngine",
     "DerivedMetrics",
     "EvaluationSummary",
     "IEvaluationEngine",
