@@ -330,3 +330,32 @@ class APIServerManager:
         if self._thread and self._thread.is_alive():
             self._thread.join(timeout=2.0)
             self._thread = None
+
+
+def main() -> None:
+    """CLI entrypoint to run the AgentLab API server and UI dashboard."""
+    import argparse
+
+    parser = argparse.ArgumentParser(description="AgentLab Local AI Coding Harness Server")
+    parser.add_argument("--host", default="127.0.0.1", help="Host interface to bind (default: 127.0.0.1)")
+    parser.add_argument("--port", type=int, default=8000, help="Port to listen on (default: 8000)")
+    parser.add_argument("--db", default="./data/ledger.db", help="Path to SQLite ledger database")
+    args = parser.parse_args()
+
+    Path(args.db).parent.mkdir(parents=True, exist_ok=True)
+    harness = Harness(db_path=args.db)
+
+    server = HarnessAPIServer(args.host, args.port, harness)
+    print(f"AgentLab Server running at {server.base_url}")
+    print(f"Dashboard UI available at {server.base_url}/")
+    print("Press Ctrl+C to stop.")
+
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("\nShutting down AgentLab server...")
+        server.server_close()
+
+
+if __name__ == "__main__":
+    main()
