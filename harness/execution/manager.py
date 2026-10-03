@@ -58,6 +58,12 @@ class ExecutionManager:
             on_transition=self._handle_state_transition
         )
 
+        from harness.skills.manager import SkillManager
+        self.skill_manager = SkillManager(
+            execution_id=self.execution_id,
+            workspace_root=self.config.workspace.root,
+            on_event=lambda ev_type, src, payload: self.emit_event(ev_type, src, payload),
+        )
         self.active_skill: Optional[ISkillSuite] = None
         self.active_model_name: str = config.model.default_model
         self.continuity_summary: Optional[SkillTransitionSummary] = None
@@ -112,35 +118,21 @@ class ExecutionManager:
         self.ledger.append(event)
         return event
 
-    def switch_skill(self, new_skill: ISkillSuite) -> None:
+    def switch_skill(self, skill: ISkillSuite | str) -> SkillTransitionSummary:
         """Replace active skill suite while preserving compact continuity summary."""
-        old_skill_name = self.active_skill.name if self.active_skill else None
-        if self.active_skill:
-            self.continuity_summary = self.active_skill.on_unload()
-            self.emit_event(
-                EventType.SKILL_UNLOADED,
-                source="skill_manager",
-                payload={
-                    "skill": old_skill_name,
-                    "continuity_summary": self.continuity_summary.model_dump(),
-                },
-            )
+        if isinstance(skill, str):
+            skill_name = skill
+        else:
+            self.skill_manager.register_skill(skill)
+            skill_name = skill.name
 
-        context = SkillContext(
-            execution_id=self.execution_id,
-            skill_name=new_skill.name,
-            continuity_summary=self.continuity_summary,
+        summary = self.skill_manager.transition_to(
+            skill_name,
             scratchpad_data=self.scratchpad.model_dump(),
-            workspace_root=self.config.workspace.root,
         )
-        new_skill.on_load(context)
-        self.active_skill = new_skill
-
-        self.emit_event(
-            EventType.SKILL_LOADED,
-            source="skill_manager",
-            payload={"skill": new_skill.name},
-        )
+        self.continuity_summary = summary
+        self.active_skill = self.skill_manager.active_skill
+        return summary
 
     def route_model(self, model_name: str, reason: str = "") -> None:
         """Dynamically route model for the current execution."""

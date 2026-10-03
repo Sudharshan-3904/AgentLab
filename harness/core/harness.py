@@ -115,6 +115,9 @@ class Harness:
             model_provider=provider,
             execution_id=execution_id,
         )
+        for skill in self.skills.values():
+            manager.skill_manager.register_skill(skill)
+
         self.executions[manager.execution_id] = manager
         return manager
 

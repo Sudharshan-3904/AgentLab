@@ -7,6 +7,7 @@ from harness.skills.interface import (
     SkillTransitionSummary,
     SkillType,
 )
+from harness.skills.manager import SkillManager
 from harness.skills.suites import (
     CodingSkillSuite,
     DebuggingSkillSuite,
@@ -21,6 +22,7 @@ __all__ = [
     "ISkillSuite",
     "PlanningSkillSuite",
     "SkillContext",
+    "SkillManager",
     "SkillTransitionSummary",
     "SkillType",
     "TestingSkillSuite",
