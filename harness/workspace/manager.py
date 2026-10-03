@@ -24,6 +24,11 @@ class WorkspaceManager(IWorkspaceManager):
         Path(self.workspace_root).mkdir(parents=True, exist_ok=True)
         self._checkpoints: Dict[str, CheckpointRecord] = {}
 
+    @property
+    def checkpoints(self) -> List[CheckpointRecord]:
+        """Return list of created checkpoints."""
+        return list(self._checkpoints.values())
+
     def _run_git(self, args: List[str]) -> subprocess.CompletedProcess:
         """Run git command inside workspace root."""
         return subprocess.run(

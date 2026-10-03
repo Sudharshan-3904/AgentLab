@@ -265,37 +265,38 @@ class ExecutionManager:
         """Transition execution to next lifecycle state."""
         self.state_machine.transition_to(state, reason=reason)
 
-    def trigger_recovery(self, failure_reason: str) -> bool:
-        """Attempt automated recovery if under configured limit."""
-        if self.recovery_attempts >= self.config.execution.max_recovery_attempts:
-            self.emit_event(
-                EventType.ERROR,
-                source="recovery_manager",
-                payload={
-                    "error": "Max recovery attempts exceeded",
-                    "attempts": self.recovery_attempts,
-                },
-            )
-            self.fail(f"Recovery failed: {failure_reason}")
-            return False
-
-        self.recovery_attempts += 1
-        self.scratchpad.add_recovery(
-            attempt=self.recovery_attempts,
-            failure=failure_reason,
-            action="Retrying execution step",
-            resolved=False,
+    def trigger_recovery(
+        self,
+        failure_reason: str,
+        error_details: Optional[str] = None,
+        checkpoint_id: Optional[str] = None,
+        messages: Optional[List[ChatMessage]] = None,
+    ) -> bool:
+        """Attempt automated recovery using RecoveryStrategyEngine."""
+        from harness.execution.recovery import RecoveryStrategyEngine
+        result = RecoveryStrategyEngine.execute_recovery(
+            manager=self,
+            failure_reason=failure_reason,
+            error_details=error_details,
+            checkpoint_id=checkpoint_id,
+            messages=messages,
         )
+        self.last_recovery_result = result
+        return result.success
+
+    def resolve_recovery(self, resolution_summary: str = "Recovery succeeded") -> None:
+        """Mark recovery as resolved, transition back to EXECUTING, and record RECOVERY_COMPLETED."""
+        if self.scratchpad.recovery_history:
+            self.scratchpad.recovery_history[-1].resolved = True
         self.emit_event(
-            EventType.RECOVERY_STARTED,
+            EventType.RECOVERY_COMPLETED,
             source="recovery_manager",
             payload={
                 "attempt": self.recovery_attempts,
-                "failure": failure_reason,
+                "summary": resolution_summary,
             },
         )
-        self.state_machine.transition_to(ExecutionState.RECOVERY, reason=failure_reason)
-        return True
+        self.state_machine.transition_to(ExecutionState.EXECUTING, reason=resolution_summary)
 
     def complete(self, reason: str = "Execution completed successfully") -> None:
         """Transition execution to COMPLETED terminal state."""

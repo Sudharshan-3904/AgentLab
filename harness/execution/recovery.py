@@ -62,6 +62,9 @@ class RecoveryResult(BaseModel):
     rollback_performed: bool = False
     details: Dict[str, Any] = Field(default_factory=dict)
 
+    def __bool__(self) -> bool:
+        return self.success
+
 
 class RecoveryStrategyEngine:
     """Orchestrates failure capture, scratchpad updates, rollback, and model re-prompting."""
@@ -158,8 +161,10 @@ class RecoveryStrategyEngine:
         # 4. Optional Rollback to checkpoint
         rollback_done = False
         target_checkpoint = checkpoint_id
-        if not target_checkpoint and manager.workspace_manager and manager.workspace_manager.checkpoints:
-            target_checkpoint = manager.workspace_manager.checkpoints[-1].checkpoint_id
+        if not target_checkpoint and manager.workspace_manager:
+            cps = getattr(manager.workspace_manager, "checkpoints", None)
+            if cps:
+                target_checkpoint = cps[-1].checkpoint_id
 
         if target_checkpoint and manager.workspace_manager:
             rollback_done = manager.rollback(target_checkpoint)
