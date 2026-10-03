@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+"""
+Alias entrypoint for main.py (handles typos like 'python main.oy').
+Redirects directly to main.py.
+"""
+from main import main
+
+if __name__ == "__main__":
+    main()
