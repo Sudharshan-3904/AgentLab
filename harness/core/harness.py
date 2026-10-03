@@ -50,7 +50,15 @@ class Harness:
         self.config = config or HarnessConfig()
         self.ledger = SQLiteEventLedger(db_path)
         self.policy_engine = policy_engine or DefaultPolicyEngine()
-        self.monitoring_manager = monitoring_manager
+
+        if monitoring_manager is not None:
+            self.monitoring_manager = monitoring_manager
+        else:
+            from harness.monitoring.manager import MonitoringManager
+            self.monitoring_manager = MonitoringManager(
+                on_sample=lambda sample: self._on_resource_sample(sample)
+            )
+
         self.evaluation_engine = evaluation_engine
 
         if workspace_manager is not None:
@@ -165,6 +173,27 @@ class Harness:
             model_calls=model_calls,
             tool_responses=tool_responses,
         )
+
+    def _on_resource_sample(self, sample: Any) -> None:
+        """Record a resource measurement event to the ledger."""
+        from harness.core.events import EventType
+        self.ledger.append(
+            Event.create(
+                execution_id=sample.execution_id,
+                type=EventType.RESOURCE_SAMPLE,
+                source="monitoring_manager",
+                payload=sample.model_dump(),
+            )
+        )
+
+    def get_live_resource_metrics(self, execution_id: str) -> Optional[Any]:
+        """Fetch the latest live resource metrics sample for an active execution."""
+        if not self.monitoring_manager:
+            return None
+        samples = self.monitoring_manager.get_samples(execution_id)
+        if samples:
+            return samples[-1]
+        return self.monitoring_manager.sample(execution_id)
 
     def close(self) -> None:
         """Release database and system resources."""
