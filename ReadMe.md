@@ -482,10 +482,10 @@ python main.py
 python main.py --open-browser
 
 # Launch with custom host, port, and provider model
-python main.py --host 127.0.0.1 --port 8000 --provider ollama --model llama3.2
+python main.py --host 127.0.0.1 --port 8000 --provider ollama --model llama3.2:latest
 
 # Launch with skill-based model routing
-python main.py --routing --planning-model llama3.2 --coding-model qwen2.5:1.5b --testing-model llama3.2
+python main.py --routing --planning-model llama3.2:latest --coding-model qwen2.5:1.5b --testing-model llama3.2:latest
 
 # Launch with autonomous execution policy and custom workspace
 python main.py --autonomy autonomous --workspace ./workspace --db ./data/ledger.db
@@ -499,7 +499,7 @@ python main.py --autonomy autonomous --workspace ./workspace --db ./data/ledger.
 | `--port` | `int` | `8000` | Port number to listen on |
 | `--open-browser` | flag | `False` | Automatically open default browser on launch |
 | `--provider` | `ollama`, `lmstudio` | `ollama` | Primary local LLM inference provider backend |
-| `--model` | `str` | `llama3.2` | Primary default model name |
+| `--model` | `str` | `llama3.2:latest` | Primary default model name |
 | `--provider-url` | `str` | `None` | Custom base endpoint URL for provider API |
 | `--routing` | flag | `True` | Enable dynamic model routing across skills |
 | `--no-routing` | flag | | Disable dynamic model routing |

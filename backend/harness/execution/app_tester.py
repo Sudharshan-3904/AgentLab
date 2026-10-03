@@ -57,7 +57,7 @@ class AppDetector:
                         app_type="python_fastapi",
                         entry_point=cand,
                         suggested_command=[sys.executable, "-m", "uvicorn", f"{module_name}:app", "--host", "127.0.0.1", "--port", "{port}"],
-                        health_path="/",
+                        health_path="/docs",
                         working_directory=str(ws),
                     )
                 elif "flask" in content.lower():

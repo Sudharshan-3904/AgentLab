@@ -596,7 +596,18 @@ class ExecutionManager:
                     self.fail(f"Verification syntax error: {syntax_error}")
                     return
 
-            # 5. Complete
+            # 5. Launch application for live preview if runnable web/API app detected
+            try:
+                if self.app_tester:
+                    detected = self.app_tester.detect(workspace_dir)
+                    if detected:
+                        self.launch_application(str(workspace_dir))
+                        import time
+                        time.sleep(0.5)
+            except Exception as e:
+                logger.warning("Could not auto-launch application for preview: %s", e)
+
+            # 6. Complete
             self.complete(reason=f"Task completed successfully: synthesized and verified {target_filename}")
 
         except Exception as ex:

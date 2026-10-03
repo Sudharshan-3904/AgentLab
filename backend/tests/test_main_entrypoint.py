@@ -150,3 +150,38 @@ def test_ui_server_start_endpoint(tmp_path):
     finally:
         server_mgr.stop()
 
+
+def test_ui_server_launch_endpoint(tmp_path):
+    import json
+    import urllib.request
+    from harness.ui.server import APIServerManager
+
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    (workspace / "server.py").write_text("import http.server\nif __name__ == '__main__': pass\n", encoding="utf-8")
+    db_file = tmp_path / "ledger.db"
+    parser = build_parser()
+    args = parser.parse_args(["--workspace", str(workspace), "--db", str(db_file)])
+    config = create_harness_config(args)
+    harness = initialize_harness(config, str(db_file))
+
+    server_mgr = APIServerManager(harness, host="127.0.0.1", port=0)
+    base_url = server_mgr.start()
+
+    try:
+        req_data = json.dumps({"objective": "Sample web server", "constraints": []}).encode("utf-8")
+        req = urllib.request.Request(f"{base_url}/executions", data=req_data, headers={"Content-Type": "application/json"}, method="POST")
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            exec_id = data["execution_id"]
+
+        launch_req = urllib.request.Request(f"{base_url}/executions/{exec_id}/launch", data=b"{}", headers={"Content-Type": "application/json"}, method="POST")
+        with urllib.request.urlopen(launch_req) as resp:
+            launch_data = json.loads(resp.read().decode("utf-8"))
+            assert launch_data["success"] is True
+            assert "url" in launch_data
+            assert "preview_url" in launch_data
+    finally:
+        server_mgr.stop()
+
+

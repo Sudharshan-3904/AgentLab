@@ -167,7 +167,7 @@ execution:
   max_recovery_attempts: 1
 model:
   default_provider: ollama
-  default_model: llama3.2
+  default_model: llama3.2:latest
 sampling:
   temperature: 0.2
   top_p: 0.9

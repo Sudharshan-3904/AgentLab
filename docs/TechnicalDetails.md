@@ -16,7 +16,7 @@ execution:
 
 model:
     default_provider: ollama
-    default_model: llama3.2
+    default_model: llama3.2:latest
 
 routing:
     enabled: true
@@ -56,7 +56,7 @@ reproducibility:
 
 model:
     provider: ollama
-    name: llama3.2
+    name: llama3.2:latest
     version: unknown
     quantization: unknown
 
@@ -382,7 +382,7 @@ execution:
     seed: 42
 
 models:
-    - llama3.2
+    - llama3.2:latest
     - qwen-coder
 
 evaluation:

@@ -122,21 +122,28 @@ class HarnessRequestHandler(http.server.BaseHTTPRequestHandler):
             self._handle_start_execution(exec_id)
             return
 
-        # 3. API: POST /executions/{id}/feedback
+        # 3. API: POST /executions/{id}/launch
+        m = re.match(r"^/(?:api/)?executions/([^/]+)/launch$", path)
+        if m:
+            exec_id = m.group(1)
+            self._handle_launch_application(exec_id)
+            return
+
+        # 4. API: POST /executions/{id}/feedback
         m = re.match(r"^/(?:api/)?executions/([^/]+)/feedback$", path)
         if m:
             exec_id = m.group(1)
             self._handle_submit_feedback(exec_id)
             return
 
-        # 4. API: POST /executions/{id}/cancel
+        # 5. API: POST /executions/{id}/cancel
         m = re.match(r"^/(?:api/)?executions/([^/]+)/cancel$", path)
         if m:
             exec_id = m.group(1)
             self._handle_cancel_execution(exec_id)
             return
 
-        # 5. API: POST /benchmarks
+        # 6. API: POST /benchmarks
         if path == "/benchmarks" or path == "/api/benchmarks":
             self._handle_create_benchmark()
             return
@@ -165,9 +172,11 @@ class HarnessRequestHandler(http.server.BaseHTTPRequestHandler):
         running_apps = []
         if hasattr(mgr, "app_tester") and mgr.app_tester:
             for app_id, app in mgr.app_tester.active_apps.items():
+                preview_url = app.url + (app.health_path if app.health_path != "/" else "")
                 running_apps.append({
                     "app_id": app_id,
                     "url": app.url,
+                    "preview_url": preview_url,
                     "host": app.host,
                     "port": app.port,
                     "status": app.status,
@@ -221,6 +230,28 @@ class HarnessRequestHandler(http.server.BaseHTTPRequestHandler):
             "state": mgr.current_state.value,
             "message": "Autonomous execution started",
         })
+
+    def _handle_launch_application(self, exec_id: str) -> None:
+        mgr = self.server.harness.get_execution(exec_id)
+        if not mgr:
+            self._send_json(404, {"error": f"Execution '{exec_id}' not found"})
+            return
+        ws_dir = mgr.config.workspace.root
+        try:
+            app = mgr.launch_application(ws_dir)
+            import time
+            time.sleep(0.8)
+            preview_url = app.url + (app.health_path if app.health_path != "/" else "")
+            self._send_json(200, {
+                "success": True,
+                "app_id": app.app_id,
+                "url": app.url,
+                "preview_url": preview_url,
+                "port": app.port,
+                "status": app.status,
+            })
+        except Exception as ex:
+            self._send_json(500, {"error": f"Failed to launch app: {ex}"})
 
     def _handle_submit_feedback(self, exec_id: str) -> None:
         mgr = self.server.harness.get_execution(exec_id)
@@ -367,11 +398,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="AgentLab Local AI Coding Harness Server")
     parser.add_argument("--host", default="127.0.0.1", help="Host interface to bind (default: 127.0.0.1)")
     parser.add_argument("--port", type=int, default=8000, help="Port to listen on (default: 8000)")
+    parser.add_argument("--model", default="llama3.2:latest", help="Default model name (default: llama3.2:latest)")
     parser.add_argument("--db", default="./data/ledger.db", help="Path to SQLite ledger database")
     args = parser.parse_args()
 
     Path(args.db).parent.mkdir(parents=True, exist_ok=True)
-    harness = Harness(db_path=args.db)
+    from harness.core.config import HarnessConfig, ModelConfig
+    config = HarnessConfig(model=ModelConfig(default_model=args.model))
+    harness = Harness(config=config, db_path=args.db)
 
     server = HarnessAPIServer(args.host, args.port, harness)
     print(f"AgentLab Server running at {server.base_url}")

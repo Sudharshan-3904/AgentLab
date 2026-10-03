@@ -424,7 +424,7 @@
       <div class="telemetry-item"><span class="status-dot"></span> System Online</div>
       <div class="telemetry-item" id="cpuMetric">CPU: --%</div>
       <div class="telemetry-item" id="ramMetric">RAM: --%</div>
-      <div class="telemetry-item" id="activeModelTag">Model: llama3.2</div>
+      <div class="telemetry-item" id="activeModelTag">Model: llama3.2:latest</div>
     </div>
   </header>
 
@@ -490,7 +490,7 @@
           <div style="margin-bottom: 1rem;">
             <p><strong>Execution ID:</strong> <span id="execIdDisplay"
                 style="font-family: var(--font-mono);">None</span></p>
-            <p><strong>Active Model:</strong> <span id="execModelDisplay">llama3.2</span></p>
+            <p><strong>Active Model:</strong> <span id="execModelDisplay">llama3.2:latest</span></p>
             <p><strong>Active Skill Suite:</strong> <span id="execSkillDisplay">PlanningSkillSuite</span></p>
             <p><strong>Recovery Attempts:</strong> <span id="execRecoveryDisplay">0</span></p>
           </div>
@@ -535,7 +535,10 @@
         <div class="card">
           <h2 class="card-title">
             <span>Live Application Preview</span>
-            <span id="appHealthBadge" class="badge badge-testing">PROBING</span>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <button class="btn" style="padding: 0.35rem 0.8rem; font-size: 0.8rem;" onclick="launchAppPreview()">Launch / Restart Preview</button>
+              <span id="appHealthBadge" class="badge badge-testing">PROBING</span>
+            </div>
           </h2>
           <p id="appUrlDisplay"
             style="font-family: var(--font-mono); margin-bottom: 0.75rem; font-size: 0.85rem; color: var(--info);">URL:
@@ -656,6 +659,14 @@
 
       if (screenId === 'screen-history') loadHistory();
       if (screenId === 'screen-execution' && currentExecutionId) refreshCurrentExecution();
+      if (screenId === 'screen-preview' && currentExecutionId) {
+        refreshCurrentExecution().then(() => {
+          const urlText = document.getElementById('appUrlDisplay').innerText;
+          if (urlText.includes('None')) {
+            launchAppPreview();
+          }
+        });
+      }
     }
 
     async function handleCreateTask(e) {
@@ -678,6 +689,30 @@
       }
     }
 
+    async function launchAppPreview() {
+      if (!currentExecutionId) {
+        alert("No active execution selected.");
+        return;
+      }
+      document.getElementById('appHealthBadge').innerText = "LAUNCHING...";
+      try {
+        const resp = await fetch(`/executions/${currentExecutionId}/launch`, { method: 'POST' });
+        const data = await resp.json();
+        if (data.error) {
+          document.getElementById('appHealthBadge').innerText = "STOPPED";
+          console.warn("App launch note:", data.error);
+        } else {
+          const targetUrl = data.preview_url || data.url;
+          document.getElementById('appUrlDisplay').innerHTML = `URL: <a href="${targetUrl}" target="_blank" style="color: var(--info); text-decoration: underline;">${targetUrl}</a>`;
+          document.getElementById('previewIframe').src = targetUrl;
+          document.getElementById('appHealthBadge').innerText = (data.status || "RUNNING").toUpperCase();
+        }
+      } catch (err) {
+        document.getElementById('appHealthBadge').innerText = "STOPPED";
+        console.error(err);
+      }
+    }
+
     async function refreshCurrentExecution() {
       if (!currentExecutionId) return;
       try {
@@ -685,7 +720,10 @@
         const data = await resp.json();
 
         document.getElementById('execIdDisplay').innerText = data.execution_id;
-        document.getElementById('execModelDisplay').innerText = data.active_model;
+        if (data.active_model) {
+          document.getElementById('execModelDisplay').innerText = data.active_model;
+          document.getElementById('activeModelTag').innerText = `Model: ${data.active_model}`;
+        }
         document.getElementById('execSkillDisplay').innerText = data.active_skill || 'None';
         document.getElementById('execRecoveryDisplay').innerText = data.recovery_attempts;
         document.getElementById('execStateBadge').innerText = data.state;
@@ -695,9 +733,13 @@
         // Handle app preview
         if (data.running_apps && data.running_apps.length > 0) {
           const app = data.running_apps[0];
-          document.getElementById('appUrlDisplay').innerText = `URL: ${app.url}`;
-          document.getElementById('previewIframe').src = app.url;
-          document.getElementById('appHealthBadge').innerText = app.status.toUpperCase();
+          const targetUrl = app.preview_url || app.url;
+          document.getElementById('appUrlDisplay').innerHTML = `URL: <a href="${targetUrl}" target="_blank" style="color: var(--info); text-decoration: underline;">${targetUrl}</a>`;
+          const currentIframeSrc = document.getElementById('previewIframe').src;
+          if (currentIframeSrc !== targetUrl && currentIframeSrc !== targetUrl + "/") {
+            document.getElementById('previewIframe').src = targetUrl;
+          }
+          document.getElementById('appHealthBadge').innerText = (app.status || 'RUNNING').toUpperCase();
         }
 
         // Fetch events

@@ -10,3 +10,4 @@ data
 exec-*
 *.egg-info/
 .pytest_cache/
+workspace/
