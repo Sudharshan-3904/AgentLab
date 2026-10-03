@@ -6,10 +6,12 @@ from harness.security.interface import (
     PolicyEvaluationContext,
     PolicyEvaluationResult,
 )
+from harness.security.policy import PolicyEngine
 
 __all__ = [
     "IPolicyEngine",
     "PolicyDecision",
+    "PolicyEngine",
     "PolicyEvaluationContext",
     "PolicyEvaluationResult",
 ]

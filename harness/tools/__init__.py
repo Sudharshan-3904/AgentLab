@@ -10,6 +10,7 @@ from harness.tools.interface import (
     ToolResponse,
     ToolStatus,
 )
+from harness.tools.manager import ToolManager
 from harness.tools.shell import ShellTool
 from harness.tools.testing import TestRunnerTool
 
@@ -21,6 +22,7 @@ __all__ = [
     "ShellTool",
     "TestRunnerTool",
     "ToolDefinition",
+    "ToolManager",
     "ToolParameter",
     "ToolRequest",
     "ToolResponse",
