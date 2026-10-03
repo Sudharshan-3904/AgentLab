@@ -21,7 +21,8 @@ from harness.tasks.task import Task
 
 logger = logging.getLogger("agentlab.ui_server")
 
-STATIC_DIR = Path(__file__).parent / "static"
+FRONTEND_DIR = (Path(__file__).parents[3] / "frontend").resolve()
+STATIC_DIR = FRONTEND_DIR if (FRONTEND_DIR / "index.html").is_file() else (Path(__file__).parent / "static")
 
 
 class HarnessRequestHandler(http.server.BaseHTTPRequestHandler):

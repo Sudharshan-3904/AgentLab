@@ -1,24 +1,5 @@
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
-[project]
-name = "local-ai-harness"
-version = "0.1.0"
-description = "Local-first execution, observability, security, and experimentation platform for AI-assisted work"
-readme = "ReadMe.md"
-requires-python = ">=3.10"
-dependencies = [
-    "pydantic>=2.0",
-    "pyyaml>=6.0",
-    "fastapi>=0.100.0",
-    "uvicorn>=0.20.0",
-    "psutil>=5.9.0",
-    "pytest>=7.0.0",
-]
-
 [tool.pytest.ini_options]
 minversion = "7.0"
-testpaths = ["tests"]
-pythonpath = ["."]
+testpaths = ["backend/tests"]
+pythonpath = ["backend"]
 addopts = "-v"

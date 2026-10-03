@@ -8,4 +8,5 @@ data
 *.db
 *.jsonl
 exec-*
+*.egg-info/
 .pytest_cache/
