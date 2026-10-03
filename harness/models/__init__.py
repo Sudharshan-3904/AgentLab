@@ -10,11 +10,13 @@ from harness.models.interface import (
     ModelRequest,
     ModelResponse,
 )
+from harness.models.lmstudio import LMStudioProvider
 from harness.models.ollama import OllamaProvider
 
 __all__ = [
     "ChatMessage",
     "IModelProvider",
+    "LMStudioProvider",
     "ModelCallRecord",
     "ModelChunk",
     "ModelHealth",
