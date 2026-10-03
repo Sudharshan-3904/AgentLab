@@ -1,4 +1,4 @@
-"""Monitoring package and interfaces."""
+"""Monitoring package and implementations."""
 
 from harness.monitoring.interface import (
     CpuMetrics,
@@ -9,13 +9,17 @@ from harness.monitoring.interface import (
     ResourceSample,
     TelemetryAvailability,
 )
+from harness.monitoring.manager import MonitoringManager
+from harness.monitoring.sampler import SystemResourceSampler
 
 __all__ = [
     "CpuMetrics",
     "GpuMetrics",
     "IMonitoringManager",
+    "MonitoringManager",
     "ProcessMetrics",
     "RamMetrics",
     "ResourceSample",
+    "SystemResourceSampler",
     "TelemetryAvailability",
 ]
