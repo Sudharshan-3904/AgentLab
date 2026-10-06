@@ -51,6 +51,7 @@ class WorkspaceConfig(BaseModel):
 class SandboxConfig(BaseModel):
     runtime: str = Field(default="docker", description="Sandbox runtime type: docker, local, etc.")
     network: bool = Field(default=False, description="Allow network access in sandbox")
+    #TODO - EXP-011: Configure CPU, RAM, VRAM, process, and time limits and propagate them to sandbox/model execution.
 
 
 class MonitoringConfig(BaseModel):

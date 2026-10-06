@@ -69,6 +69,8 @@ class RecoveryResult(BaseModel):
 class RecoveryStrategyEngine:
     """Orchestrates failure capture, scratchpad updates, rollback, and model re-prompting."""
 
+    #TODO - EXP-006: Add selectable alternate-model, alternate-skill, context-reduction, and diagnosis strategies for comparison.
+
     @classmethod
     def formulate_recovery_prompt(
         cls,

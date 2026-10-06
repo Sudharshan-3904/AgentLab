@@ -36,6 +36,7 @@ class RawMetrics(BaseModel):
 
 class DerivedMetrics(BaseModel):
     """Calculated metrics derived from raw metrics and execution events."""
+    #TODO - EXP-004: Derive user interventions, blocked actions, and security events for autonomy-condition comparisons.
     task_success: bool = False
     tokens_per_second: Optional[float] = None
     tool_success_rate: float = 1.0

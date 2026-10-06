@@ -28,6 +28,8 @@ DANGEROUS_COMMAND_PATTERNS = [
 class PolicyEngine(IPolicyEngine):
     """Enforces autonomy policy matrix and workspace boundary constraints."""
 
+    #TODO - EXP-009: Add a repeatable security attack corpus and record attempted action, policy/sandbox response, and outcome.
+
     def __init__(self, confirmed_by_user: bool = False):
         self.confirmed_by_user = confirmed_by_user
 

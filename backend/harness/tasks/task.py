@@ -11,6 +11,8 @@ from pydantic import BaseModel, Field
 class Task(BaseModel):
     """Represents a validated user development task submitted to the harness."""
 
+    #TODO - EXP-010: Preserve source/trust labels for repository, test, tool, and external content before prompt-injection evaluation.
+
     task_id: str = Field(default_factory=lambda: f"task-{uuid.uuid4().hex[:8]}")
     objective: str = Field(..., min_length=1, description="Primary goal or description of task")
     constraints: List[str] = Field(default_factory=list, description="Rules or restrictions")

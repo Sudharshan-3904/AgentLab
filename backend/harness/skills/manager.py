@@ -25,6 +25,7 @@ class SkillManager:
         self.active_skill: Optional[ISkillSuite] = None
         self.latest_continuity_summary: Optional[SkillTransitionSummary] = None
         self.transition_history: List[Dict[str, Any]] = []
+        #TODO - EXP-012: Add versioned runtime replacement of active/registered suites while preserving execution state.
 
     def register_skill(self, skill: ISkillSuite) -> None:
         """Register a skill suite."""
@@ -50,6 +51,7 @@ class SkillManager:
         scratchpad_data: Optional[Dict[str, Any]] = None,
     ) -> SkillTransitionSummary:
         """Switch active skill suite to target_skill_name, maintaining task continuity."""
+        #TODO - EXP-003: Make context retention selectable as full history, continuity summary, or summary plus scratchpad.
         if target_skill_name not in self._registered_skills:
             raise ValueError(
                 f"Cannot transition to unregistered skill: '{target_skill_name}'. "

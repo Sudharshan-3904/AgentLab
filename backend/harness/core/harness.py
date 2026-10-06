@@ -36,6 +36,8 @@ class DefaultPolicyEngine(IPolicyEngine):
 class Harness:
     """The central Local AI Harness orchestrator."""
 
+    #TODO - EXP-013: Add a generated-component registry with schema/security validation before components can be activated.
+
     def __init__(
         self,
         config: Optional[HarnessConfig] = None,

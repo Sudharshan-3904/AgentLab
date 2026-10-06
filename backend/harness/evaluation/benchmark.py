@@ -21,6 +21,7 @@ logger = logging.getLogger("agentlab.benchmark")
 class BenchmarkTask(BaseModel):
     """Specification for a reproducible coding benchmark task."""
 
+    #TODO - EXP-008: Add task category and complexity metadata for the full coding-agent scaling suite.
     task_id: str
     name: str
     objective: str
@@ -79,6 +80,7 @@ class StandardBenchmarkSuite:
 class BenchmarkRunner:
     """Executes benchmark suites and computes aggregate benchmark performance reports."""
 
+    #TODO - EXP-000: Add manifest-driven seeds and repetitions, environment/model capture, and reproducibility-package export.
     def __init__(
         self,
         harness: Harness,
@@ -96,6 +98,7 @@ class BenchmarkRunner:
         executor_fn: Optional[Callable[[Any, BenchmarkTask], bool]] = None,
     ) -> EvaluationSummary:
         """Execute a single benchmark task in its own isolated execution context."""
+        #TODO - EXP-000: Add a direct-provider control path and collect comparable call, token, latency, and resource telemetry.
         task_obj = Task(
             task_id=task.task_id,
             objective=task.objective,
@@ -148,6 +151,12 @@ class BenchmarkRunner:
         executor_fn: Optional[Callable[[Any, BenchmarkTask], bool]] = None,
     ) -> BenchmarkReport:
         """Run all tasks in the suite and aggregate results."""
+        #TODO - EXP-001: Compare generic-skill and skill-switched conditions, including skill transition overhead.
+        #TODO - EXP-002: Compare single-model and phase-routed conditions, including model-switch overhead.
+        #TODO - EXP-005: Add model-only through monitored-ledger execution tiers and capture disk-write overhead.
+        #TODO - EXP-007: Run coarse, fine-grained, and combined tool profiles with per-profile efficiency metrics.
+        #TODO - EXP-014: Run named harness configurations against identical tasks and produce statistical comparisons.
+        #TODO - EXP-000: Persist raw telemetry, summaries, analysis, technical reports, and public/reproduction artifacts.
         summaries: List[EvaluationSummary] = []
         total_p = 0
         total_f = 0

@@ -22,6 +22,8 @@ from harness.monitoring.interface import (
 class SystemResourceSampler:
     """Collects hardware and process telemetry without inventing unsupported values."""
 
+    #TODO - EXP-005: Sample per-execution disk writes so monitoring and ledger overhead can be measured.
+
     def __init__(self):
         self._process = psutil.Process(os.getpid())
         # Prime cpu_percent
