@@ -4,6 +4,7 @@ logs
 data
 
 *.env
+*.db
 *.log
 *.db
 *.jsonl
